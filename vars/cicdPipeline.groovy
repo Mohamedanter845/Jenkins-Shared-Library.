@@ -22,13 +22,17 @@ def call(String projectPath) {
     }
 
     stage('PushImage') {
-        withCredentials([string(credentialsId: 'docker-hub-token', variable: 'DOCKER_PASSWORD')]) {
-            sh '''
-                echo $DOCKER_PASSWORD | docker login -u your-dockerhub-username --password-stdin
-                docker push your-dockerhub-username/jenkins-app:${BUILD_NUMBER}
-            '''
+    steps {
+        script {
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                sh """
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push your-dockerhub-username/jenkins-app:12
+                """
+            }
         }
     }
+}
 
     stage('RemoveImageLocally') {
         sh "docker rmi your-dockerhub-username/jenkins-app:${BUILD_NUMBER} || true"
