@@ -1,4 +1,5 @@
 def call(String projectPath) {
+
     stage('RunUnitTest') {
         dir(projectPath) {
             sh 'mvn test'
@@ -22,20 +23,16 @@ def call(String projectPath) {
     }
 
     stage('PushImage') {
-    steps {
-        script {
-            withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                sh """
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    docker push your-dockerhub-username/jenkins-app:12
-                """
-            }
+        withCredentials([usernamePassword(credentialsId: 'docker-hub-token', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+            sh """
+                echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                docker push your-dockerhub-username/jenkins-app:${env.BUILD_NUMBER}
+            """
         }
     }
-}
 
     stage('RemoveImageLocally') {
-        sh "docker rmi your-dockerhub-username/jenkins-app:${BUILD_NUMBER} || true"
+        sh "docker rmi your-dockerhub-username/jenkins-app:${env.BUILD_NUMBER} || true"
     }
 
     stage('DeployOnK8s') {
