@@ -37,6 +37,7 @@ pipeline {
                 script {
                     NAMESPACE = (BRANCH_NAME == 'main') ? 'main' : (BRANCH_NAME == 'stag') ? 'stag' : 'dev'
                     sh "kubectl -n ${NAMESPACE} set image deployment/jenkins-app jenkins-app=${IMAGE_TAG} --record || kubectl -n ${NAMESPACE} apply -f Jenkins_App/k8s/"
+
                 }
             }
         }
