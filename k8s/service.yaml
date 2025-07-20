@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: jenkins-app-service
-  namespace: main
+  namespace: dev
 spec:
   selector:
     app: jenkins-app
